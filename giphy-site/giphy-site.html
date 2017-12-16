@@ -1,0 +1,145 @@
+<!-- TO DO: gifs load as still images, play / pause gifs, input for new buttons, styling -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+ <head>
+     <meta charset="UTF-8">
+     <title>Gifs of your favorite soccer players!</title>
+     <!-- Bootswatch styling -->
+     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/flatly/bootstrap.min.css">
+     <!-- Font Awesome CSS -->
+     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+     <link rel="stylesheet" type="text/css" href="assets/style.css">
+ </head>
+ <body>
+    <div class="jumbotron">
+        <h1>Click on your favorite soccer player</h1>
+        <h2>See 10 awesome gifs of that player</h2>
+    <div class="container">
+        <div id="buttonsView">
+        </div>
+        <div id="form">
+            <form id="player-form">
+                <label for="player-input">Add YOUR favorite player</label>
+                <input type="text" id="player-input">
+                <input class="btn btn-primary btn-sm" id="addPlayer" type="submit" value="You can do it, young'n">
+            </form>
+        </div>
+        <br>
+
+        <button class="btn btn-primary btn-lg" data-player="Zlatan">Zlatan</button>
+        <button class="btn btn-primary btn-lg" data-player="Messi">Messi</button>
+        <button class="btn btn-primary btn-lg" data-player="Neymar">Neymar</button>
+        <button class="btn btn-primary btn-lg" data-player="Cristiano Ronaldo">Cristiano</button>
+        <button class="btn btn-primary btn-lg" data-player="Alexis Sanchez">Alexis</button>
+    </div>
+        <!-- come back to add input where users can create buttons for their favorite players -->
+        
+        <div id="gifs-appear-here">
+        </div>
+    </div>
+    <!-- borders -->
+    <div id="top"></div>
+    <div id="bottom"></div>
+    <div id="left"></div>
+    <div id="right"></div>
+
+
+    <!-- code above here -->
+    <!-- jQuery -->
+    <script
+    src="https://code.jquery.com/jquery-3.2.1.min.js"
+    integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+    crossorigin="anonymous">
+    </script>
+
+    <!-- link to javascript file -->
+    <!-- <script> -->
+     <!-- src="assets/app.js" -->
+    
+     <script type="text/javascript">
+    
+    // add player button
+    
+    // create an array. might need to replace hard-coded values in html to make this work
+    var players = [];
+
+    function makeButtons(){ // remember to add this to the html
+        $("#buttonsView").empty(); // clear old players in array
+        for (i=0; i<players.length; i++){
+            var newButton = $("<button>");
+            newButton.addClass("player");
+            newButton.attr("data-name", players[i]);
+            newButton.text(players[i]);
+            $("buttonsView").append(newButton);
+        }
+    };
+    
+    $("#addButton").on("click", function(){
+        var player = $("#player-input").val().trim();
+        players.push(player);
+        makeButtons();
+        return false; // should let users hit Enter instead of clicking submit
+    });
+    
+    $("button").on("click", function(){
+        // listener for click on button
+        var player = $(this).attr("data-player");
+        console.log(player);
+        // come back to create vars for apiKey and limit
+        // construct query
+        var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + player + "&api_key=dc6zaTOxFJmzC&limit=10";
+        // API call
+        console.log(queryURL);
+        $.ajax({
+            url: queryURL,
+            method: "GET"
+        })
+        // come back to have gifs load still, start when clicked, and stop when clicked again
+    
+        // when API call is done
+        .done(function(gifsreturned) {
+            var results = gifsreturned.data;
+            console.log(results);
+            // loop over all results
+            for (i=0; i<results.length; i++) {
+                var divGif = $("<div class='gif'>"); // remember stupid angled brackets
+                // return the rating
+                var rating = results[i].rating;
+                // show the rating
+                var ptag = $("<p>").text("Gif rating: " + rating);
+                // create image tag - DON'T FORGET
+                var playerImage = $("<img>");
+                playerImage.attr("src", results[i].images.fixed_height_still.url);
+                // playerImage.attr("data-state") - review the pausing-gifs activity to create the img tags correctly
+                playerImage.attr("data-still", results[i].images.fixed_height_still.url);
+                playerImage.attr("data-animate", results[i].images.fixed_height.url);
+                playerImage.attr("data-state", "still");
+                playerImage.addClass("gif");
+                // append the ptag and image
+                divGif.append(ptag);
+                divGif.append(playerImage);
+                // add it to the HTML div
+                $("#gifs-appear-here").prepend(divGif);
+            }
+        });
+    });
+
+    // animate gifs
+    $(document).on("click", ".gif", function(){
+        var state = $(this).attr("data-state");
+        console.log(state);
+        if (state == "still"){
+            $(this).attr("src", $(this).data("animate"));
+            $(this).attr("data-state", "animate");
+        }
+        else {
+            $(this).attr("src", $(this).data("still"));
+            $(this).attr("data-state", "still");
+        };
+    });
+    </script>
+ </body>
+
+</html>
