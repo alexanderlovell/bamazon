@@ -11,7 +11,7 @@ MANAGER PORTAL
 
 The Bamazon Customer Portal allows users to view and edit the inventory of the store. The user will be prompted to choose from the following options:
 
-View products for sale
-View low inventory
-Add to inventory
-Add a new product
+1) View products for sale;
+2) View low inventory;
+3) Add to inventory;
+4) Add a new product
